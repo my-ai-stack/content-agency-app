@@ -13,11 +13,24 @@ User selects content type → Fills brief form → AI generates → Copy/downloa
 ```
 
 ## Setup
+
 ```bash
+git clone https://github.com/my-ai-stack/content-agency-app.git
 cd content-agency-app
 npm install
 npm run dev
 ```
+
+Then open **http://localhost:3000** in your browser.
+
+## Deploy to Vercel
+
+```bash
+vercel --prod
+```
+
+Add env var in Vercel dashboard:
+- `STACK_API_URL` → `https://www.stack-ai.me/api/generate`
 
 ## API
 `POST /api/generate`
