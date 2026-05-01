@@ -18,6 +18,15 @@ User selects content type → Fills brief form → AI generates → Copy/downloa
 git clone https://github.com/my-ai-stack/content-agency-app.git
 cd content-agency-app
 npm install
+```
+
+Create a `.env.local` file:
+```bash
+echo "GROQ_API_KEY=gsk_YOUR_KEY_HERE" > .env.local
+```
+
+Then run:
+```bash
 npm run dev
 ```
 
@@ -30,7 +39,7 @@ vercel --prod
 ```
 
 Add env var in Vercel dashboard:
-- `STACK_API_URL` → `https://www.stack-ai.me/api/generate`
+- `GROQ_API_KEY` → your Groq API key
 
 ## API
 `POST /api/generate`

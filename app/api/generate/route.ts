@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prompts } from "../../lib/prompts";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,29 +13,36 @@ export async function POST(req: NextRequest) {
     }
 
     const prompt = buildPrompt(contentType, topic, industry, audience, tone, goal);
+    const apiKey = process.env.GROQ_API_KEY;
 
-    // Call Stack 3.0 API — update STACK_API_URL to your deployed endpoint
-    const STACK_API_URL =
-      process.env.STACK_API_URL || "https://www.stack-ai.me/api/generate";
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "GROQ_API_KEY is not configured." },
+        { status: 500 }
+      );
+    }
 
-    const response = await fetch(STACK_API_URL, {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
-        prompt,
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
         temperature: 0.7,
         max_tokens: 1024,
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`Stack API error: ${response.status}`);
+      const err = await response.text();
+      throw new Error(`Groq API error: ${response.status} — ${err}`);
     }
 
     const data = await response.json();
-    const content = typeof data === "string"
-      ? data
-      : data.content || data.response || JSON.stringify(data);
+    const content = data.choices?.[0]?.message?.content || "";
 
     return NextResponse.json({ content });
   } catch (err) {
@@ -100,7 +106,6 @@ Topic: ${topic}
 Write all 5 posts now, clearly separated.`;
   }
 
-  // email
   return `Write a promotional email for a ${industry} business targeting ${audience}.
 
 Tone: ${tone}
